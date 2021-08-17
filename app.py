@@ -2,7 +2,7 @@ from flask import Flask, request, render_template
 import re
 import pickle
 
-model=pickle.load(open('model.pkl','rb'))
+model=pickle.load(open('automl_model.pkl','rb'))
 tfidf=pickle.load(open('tfidf.pkl','rb'))
 app=Flask(__name__)
 
