@@ -4,6 +4,8 @@ import pickle
 
 model=pickle.load(open('automl_model.pkl','rb'))
 tfidf=pickle.load(open('tfidf.pkl','rb'))
+
+# flask names
 app=Flask(__name__)
 
 @app.route('/')

@@ -38,7 +38,7 @@ body{
 	height: 800px;
 	margin: 20px auto;
 	text-align:center;
-	background: #d5f4e6;
+	background: #80ced6;
 
 	
 	
@@ -124,15 +124,16 @@ body{
 <body>
 	<div id="big_wrapper">
 		<header id="top_header">
-			<h1>FAKE NEWS CLASSIFIER !!!<h1>
+			<h1>COVID-19 FAKE NEWS CLASSIFIER <h1>
+				<h2>This AI based web page checks if particular news are fake or real<h2>
 		</header>
 		
 		<form id="input_text" action="{{ url_for('classify')}}" method="POST">
 		
-			<input type="text" name="news_title" placeholder="News Title" required="required" id="mytext1"/><br><br>
+			<input type="text" name="news_title" placeholder="COVID-19 news title" required="required" id="mytext1"/><br><br>
 		
 		
-			<input type="text" name="news_content" placeholder="News Content" required="required" id="mytext2" />
+			<input type="text" name="news_content" placeholder="COVID-19 news content" required="required" id="mytext2" />
 		
     		<button type="submit" id="button_submit">Check if the article is fake</button>
     		<br>
