@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template
 import re
 import pickle
+import pandas as pd
 
 model=pickle.load(open('automl_model.pkl','rb'))
-tfidf=pickle.load(open('tfidf.pkl','rb'))
+tfidf=pickle.load(open('tfidf_vectorizer.pkl','rb'))
 
 # flask names
 app=Flask(__name__)
@@ -21,13 +22,9 @@ def classify():
         total=query_title+query_content
         total = re.sub('<[^>]*>', '', total)
         total = re.sub(r'[^\w\s]','', total)
-        total = total.lower()     
-        data=[total]
-        vect=tfidf.transform(data).toarray()
-        pred=model.predict(vect)
+        pred=model.predict([total])
     
     return render_template('index.html', prediction_text='The news is : {}'.format(pred[0]))
     
-if __name__=="__main__":
-    app.run(debug=True)
-    
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=80)
