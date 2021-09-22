@@ -16,23 +16,30 @@ from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 import pickle
 from supervised.automl import AutoML
+from sklearn.metrics import f1_score, precision_score, recall_score
 
-# import
+# import data sets as splitted by the author - train - val - test
 df_train = pd.read_csv(r'data\newdata\Constraint_Train.csv')
-df_train.columns = ['id', 'Text', 'Label']
 df_val = pd.read_csv(r'data\newdata\Constraint_Val.csv')
-df_val.columns = ['id', 'Text', 'Label']
 df_test = pd.read_csv(r'data\newdata\english_test_with_labels.csv')
-df_test.columns = ['id', 'Text', 'Label']
-df_test = df_test.sample(frac = 0.4, random_state = 123)
 
-# append all
+# rename columns
+df_train.columns = ['id', 'Text', 'Label']
+df_val.columns = ['id', 'Text', 'Label']
+df_test.columns = ['id', 'Text', 'Label']
+
+# append train vald
 data = df_train.append([df_val])
-data = data.sample(frac = 0.4, random_state = 123)
+
+# select 40% of the data
+data = data.sample(frac = 0.4, random_state = 29)
+df_test = df_test.sample(frac = 0.4, random_state = 29)
 
 # remap labels
 data = data.replace({'Label': {'real': 0, 'fake': 1}})
-# show
+df_test = df_test.replace({'Label': {'real': 0, 'fake': 1}})
+
+# show first 5 rws for validation
 print(data.head(5))
 
 # Data Exploration and Data Engineering
@@ -44,10 +51,6 @@ data=data.fillna(' ')
 print(data.isnull().sum())
 data['Text'] = data['Text'].str.replace('[^\w\s]','')
 data['Text'] = data['Text'].str.lower()
-
-# data validation
-print(data['Text'][0])
-print(data['Text'][45])
 
 # Word Cloud Visualization
 plt.figure(figsize = (20,20)) 
@@ -80,21 +83,20 @@ automl = AutoML(mode="Compete")
 tfidf_train = tfidf_train.toarray() 
 automl.fit(tfidf_train, y_train)
 
+# predictions and metrics
 prediction = automl.predict(tfidf_test.toarray() )
-y_test = y_test.replace({'real': 0, 'fake': 1})
 print('Accuracy of AutoML on test set:', accuracy_score(y_test, prediction))
-from sklearn.metrics import f1_score, precision_score, recall_score
-f1_score(y_test, prediction, average='macro')
-precision_score(y_test, prediction, average='macro')
-recall_score(y_test, prediction, average='macro')
+print('F1 score of AutoML on test set:', f1_score(y_test, prediction, average='macro'))
+print('Precision of AutoML on test set:', precision_score(y_test, prediction, average='macro'))
+print('Recall of AutoML on test set:', recall_score(y_test, prediction, average='macro'))
 
+# confusion matrix
 result = confusion_matrix(y_test.values, prediction)
-print(prediction)
+print(result)
 
 
-# save the model
-Pkl_Filename = "automl_compete_model.pkl"  
-
+# save the model as pkl
+Pkl_Filename = "automl_compete_model.pkl"
 with open(Pkl_Filename, 'wb') as file:  
     pickle.dump(automl, file)
 
