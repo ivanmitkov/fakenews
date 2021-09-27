@@ -16,16 +16,30 @@ from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 import pickle
 from supervised.automl import AutoML
+from sklearn.metrics import f1_score, precision_score, recall_score
 
-# import
-df_fakenews = pd.read_csv(r'data\fakeNews.csv')[['Text', 'Binary Label']]
-df_truenews = pd.read_csv(r'data\trueNews.csv')[['Text', 'Label']]
+# import data sets as splitted by the author - train - val - test
+df_train = pd.read_csv(r'data\newdata\Constraint_Train.csv')
+df_val = pd.read_csv(r'data\newdata\Constraint_Val.csv')
+df_test = pd.read_csv(r'data\newdata\english_test_with_labels.csv')
 
-# data preparation
-df_fakenews.columns = ['Text', 'Label']
-data = df_fakenews.append(df_truenews).reset_index(drop = True)
+# rename columns
+df_train.columns = ['id', 'Text', 'Label']
+df_val.columns = ['id', 'Text', 'Label']
+df_test.columns = ['id', 'Text', 'Label']
 
-# show
+# append train vald
+data = df_train.append([df_val])
+
+# select 40% of the data
+data = data.sample(frac = 0.4, random_state = 29)
+df_test = df_test.sample(frac = 0.4, random_state = 29)
+
+# remap labels
+data = data.replace({'Label': {'real': 0, 'fake': 1}})
+df_test = df_test.replace({'Label': {'real': 0, 'fake': 1}})
+
+# show first 5 rws for validation
 print(data.head(5))
 
 # Data Exploration and Data Engineering
@@ -38,13 +52,9 @@ print(data.isnull().sum())
 data['Text'] = data['Text'].str.replace('[^\w\s]','')
 data['Text'] = data['Text'].str.lower()
 
-# data validation
-print(data['Text'][0])
-print(data['Text'][45])
-
 # Word Cloud Visualization
 plt.figure(figsize = (20,20)) 
-wc = WordCloud(max_words = 2000 , width = 1600 , height = 800 , stopwords = STOPWORDS).generate(" ".join(data[data.Label == 0].Text))
+wc = WordCloud(max_words = 2000 , width = 1600 , height = 800 , stopwords = STOPWORDS).generate(" ".join(df_val.Text))
 plt.imshow(wc, interpolation = 'bilinear')
 
 # second cloud
@@ -53,11 +63,10 @@ wc = WordCloud(max_words = 2000 , width = 1600 , height = 800 , stopwords = STOP
 plt.imshow(wc, interpolation = 'bilinear')
 
 # Train-Test Split
-y = data.Label
-print(y)
-
-data.drop("Label", axis=1,inplace=True)
-X_train, X_test, y_train, y_test = train_test_split(data['Text'], y, test_size=0.2,random_state=102)
+X_train = data.Text.reset_index(drop = True)
+y_train = data.Label.reset_index(drop = True)
+X_test = df_test.Text.reset_index(drop = True)
+y_test = df_test.Label.reset_index(drop = True)
 
 # Validate the shapes of training and test
 print(X_train.shape, y_train.shape)
@@ -74,14 +83,20 @@ automl = AutoML(mode="Compete")
 tfidf_train = tfidf_train.toarray() 
 automl.fit(tfidf_train, y_train)
 
+# predictions and metrics
 prediction = automl.predict(tfidf_test.toarray() )
 print('Accuracy of AutoML on test set:', accuracy_score(y_test, prediction))
-result = confusion_matrix(y_test, prediction)
-print(prediction)
+print('F1 score of AutoML on test set:', f1_score(y_test, prediction, average='macro'))
+print('Precision of AutoML on test set:', precision_score(y_test, prediction, average='macro'))
+print('Recall of AutoML on test set:', recall_score(y_test, prediction, average='macro'))
+
+# confusion matrix
+result = confusion_matrix(y_test.values, prediction)
+print(result)
 
 
-# save the model
-Pkl_Filename = "automl_compete_model.pkl"  
-
+# save the model as pkl
+Pkl_Filename = "automl_compete_model.pkl"
 with open(Pkl_Filename, 'wb') as file:  
     pickle.dump(automl, file)
+
