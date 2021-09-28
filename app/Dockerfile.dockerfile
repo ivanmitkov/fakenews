@@ -1,23 +1,17 @@
-# STEP 1: Install base image. Optimized for Python.
+#install base image. optimized for python.
 FROM python:3.7.10
 
-
+#portal 80
 EXPOSE 80
 
-
-#Use working directory /app
+#use working directory /app
 WORKDIR /app
 
-#Copy all the content of current directory to /app
+#copy all the content of current directory to /app
 ADD . /app
 
-#Installing required packages
+#installing required packages
 RUN pip install -r requirements.txt
 
-
-#Set environment variable
-#ENV NAME OpentoAll
-
-
-
+#entrypoint
 ENTRYPOINT python app.py
