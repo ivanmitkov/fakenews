@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from sklearn.metrics import confusion_matrix 
+from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 import pickle
@@ -53,12 +53,12 @@ data['Text'] = data['Text'].str.replace('[^\w\s]','')
 data['Text'] = data['Text'].str.lower()
 
 # Word Cloud Visualization
-plt.figure(figsize = (20,20)) 
+plt.figure(figsize = (20,20))
 wc = WordCloud(max_words = 2000 , width = 1600 , height = 800 , stopwords = STOPWORDS).generate(" ".join(df_val.Text))
 plt.imshow(wc, interpolation = 'bilinear')
 
 # second cloud
-plt.figure(figsize = (20,20)) 
+plt.figure(figsize = (20,20))
 wc = WordCloud(max_words = 2000 , width = 1600 , height = 800 , stopwords = STOPWORDS).generate(" ".join(data[data.Label == 1].Text))
 plt.imshow(wc, interpolation = 'bilinear')
 
@@ -73,14 +73,16 @@ print(X_train.shape, y_train.shape)
 print(X_test.shape, y_test.shape)
 
 # Cleaning Data using NLP Techniques
-tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.80)  
-tfidf_train = tfidf_vectorizer.fit_transform(X_train) 
+tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.80)
+tfidf_train = tfidf_vectorizer.fit_transform(X_train)
 tfidf_test = tfidf_vectorizer.transform(X_test)
 
 # Implementing Classification Algorithm
 # autoML
-automl = AutoML(mode="Compete")
-tfidf_train = tfidf_train.toarray() 
+automl = AutoML(mode="Compete",
+                eval_metric = 'accuracy',
+                results_path = 'fake_news_classifier')S
+tfidf_train = tfidf_train.toarray()
 automl.fit(tfidf_train, y_train)
 
 # predictions and metrics
@@ -96,7 +98,10 @@ print(result)
 
 
 # save the model as pkl
-Pkl_Filename = "automl_compete_model.pkl"
-with open(Pkl_Filename, 'wb') as file:  
+pkl_model_filename = r"app/automl_model.pkl"
+with open(pkl_model_filename, 'wb') as file:
     pickle.dump(automl, file)
 
+pkl_tfidf_filename = r"app/tfidf_vectorizer.pkl"
+with open(pkl_tfidf_filename, 'wb') as file:
+    pickle.dump(tfidf_vectorizer, file)

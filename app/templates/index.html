@@ -4,7 +4,7 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title> Fake News Classifier</title>
+	<title> Fake COVID-19 News Classifier</title>
 	
 	<style>
 	*{
@@ -27,7 +27,7 @@ header, section, footer, article, hgroup{
 
 body{
 	text-align:;
-	background:#80ced6;
+	background:#008B8B;
 	
 }
 
@@ -38,14 +38,14 @@ body{
 	height: 800px;
 	margin: 20px auto;
 	text-align:center;
-	background: #80ced6;
+	background: #008B8B;
 
 	
 	
 }
 
 #top_header{
-	background:#fefbd8;
+	background:#8FBC8Fd8;
 	border: 1px #618685;
 	padding: 20;
 	
@@ -105,7 +105,7 @@ body{
 #button_submit{
   border: none;
   color: black;
-  background: #fefbd8;
+  background: #8FBC8F;
   border: 3px black;
   padding: 15px 32px;
   text-align: center;
@@ -130,8 +130,6 @@ body{
 		
 		<form id="input_text" action="{{ url_for('classify')}}" method="POST">
 		
-			<input type="text" name="news_title" placeholder="COVID-19 news title" required="required" id="mytext1"/><br><br>
-		
 		
 			<input type="text" name="news_content" placeholder="COVID-19 news content" required="required" id="mytext2" />
 		
@@ -146,7 +144,7 @@ body{
 		
 		
 		
-		<footer id="input_footer"><span id="bottom"> Copyright Ivan Mitkov 2021 </span></footer>
+		<footer id="input_footer"><span id="bottom"> Master Thesis Ivan Mitkov 2021 </span></footer>
 		
 		
 		
